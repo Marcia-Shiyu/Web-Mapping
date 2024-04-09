@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <title>University of Oregon Mapping</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <!--    Include the reference to the Mapbox JavaScript here in the <head> of the page    -->
+      <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js'></script>
+
+
+          
+    <!--    Include the reference to the Mapbox CSS here in the <head> of the page    -->
+      <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css' rel='stylesheet' />
+
+    <style>
+        /* Insert the CSS code here between the <style> tags */
+          body { margin:0; padding:0; }
+          #map { position:absolute; top:0; bottom:0; width:100%; }  
+
+          #title {
+          z-index: 9999;
+          background-color: white;
+          opacity: 80%;
+          text-align: center;
+          color: #ff6200; /* Custom color for the text */
+          padding: 10px 0; /* Added padding */
+        }
+
+    </style>
+  </head>
+
+  <body>
+    <!--  Insert the map div here in the <body> of the page  -->
+      <div id='map'></div>
+    <!--  Insert the tile div here (part V) -->
+    <div id='title'>
+      <h1>Explore Portland</h1>
+      <h2>Map By: Shiyu Zhang</h2>
+        </div>
+
+
+    <script>
+        // Insert the JavaScript within the <script> tags, within the body   
+        // Start with the Mapbox access token here
+        mapboxgl.accessToken = 'pk.eyJ1Ijoic2hpeXUtemhhbmciLCJhIjoiY2x1bGtlOHh2MTJ1eTJrbzF0bjd0cndyZSJ9.tFLexsDGgB-w2HI9K9s2uw'; //  Put your access token between the single quotes.
+   
+        // Then initialize the map here
+        var map = new mapboxgl.Map({
+          container: 'map', // id of a div on your page, where the map will be inserted
+          style: 'mapbox://styles/mapbox/outdoors-v12', // stylesheet location
+          center: [-122.6788, 45.5212], // starting position [lng, lat] eg. [-122.6788, 45.5212]
+          zoom: 11 // starting zoom 
+        });
+    
+
+        // Add popup markers here  (part IV)
+        var popup = new mapboxgl.Popup({ offset: 25 })
+            .setHTML('Hello World. Welcome to Portland!');
+
+            var customMarker = new mapboxgl.Marker({ color: '#FFC0CB' }) // Use any color code
+                .setLngLat([-122.60, 45.50]) // Example coordinates, change as needed
+                .setPopup(popup) //add the popup with the variable name 'popup' to the marker 
+                .addTo(map);
+
+        var popup_layer = new mapboxgl.Popup({
+              closeOnClick: true, anchor: 'top-right'
+            })
+            .setLngLat([-122.66, 45.55])
+            .setHTML('<h1>Hi Portland!</h1>')
+            .addTo(map);
+
+
+        // Add any other variables such as markers here (part III)
+        var popup_layer_unionstation = new mapboxgl.Popup({
+          closeOnClick: false, anchor: 'top-left'
+          })
+          .setLngLat([-122.6783, 45.5307]) // These are the approximate coordinates for Union Station, Portland
+          .setHTML('<h3>Union Station at Portland, Oregon</h3><p>Check out the <a href="https://www.amtrak.com/stations/pdx" target="_blank">Amtrak website</a> for train schedules.</p>')
+          .addTo(map);
+
+            var unionStationMarker = new mapboxgl.Marker({
+                  color: '#008000' // Green color
+                })
+                .setLngLat([-122.6783, 45.5307]) // Coordinates for Union Station, Portland
+                .setPopup(popup_layer_unionstation)
+                .addTo(map);
+
+
+        // Add optional advanced "On load" function here
+    
+    </script>
+
+  </body>
+
+</html>
