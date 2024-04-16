@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <title>Fixed Map: Cherry Blossom Journey</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <!--    1.1.  Include the reference to the Mapbox JavaScript here in the <head> of the page  -->
+            <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js'></script>  
+    <!--    1.2 Include the reference to the Mapbox CSS here in the <head> of the page  -->
+            <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        /* 1.4 Insert the CSS code here between the <style> tags */
+           body { margin:50px; padding:0; }
+           #map1 { position:relative; height:300px; width:100%;}
+           #map2 { position:relative; height:300px; width:100%;}
+           #map3 { position:relative; height:300px; width:100%;}
+        /* 2.5.2 Insert additional CSS code here between the <style> tags */
+
+    </style>
+  </head>
+
+  <body>
+        <!-- 1.3 Insert the div for the structure of the page here in the <body> of the page -->
+         <h1> Map 1: Washington DC Cherry Blossoms </h1>
+                <p>Each spring, the Tidal Basin is surrounded by pink and white blooms, drawing visitors from all over the globe. The first time I explored the beauty of cherry blossoms in Washington DC was in 2022. I highly recommend this city if you want to see cherry blossom and you do not want to travel abroad.</p>
+                 <div id='map1'></div>
+         <hr>
+         <h1> Map 2: Wuhan Cherry Blossoms</h1>
+                <p>Discover the vibrant cherry blossoms at Wuhan's East Lake. This scenic spot offers spectacular views of pink blossoms that perfectly reflect in the tranquil lake waters. I lived in Wuhan for four years and each spring my friends and I had picnic by the lake and enjoyed the blossom together. </p>
+                 <div id='map2'></div>
+         <hr>
+         <h1> Map 3: Tokyo Cherry Blossoms</h1>
+                <p>Ueno Park comes alive with the bloom of thousands of cherry trees. People celebrate with festivals and picnics under the pink canopy. I hope that my family and I can see the beautiful scenery together some time next year. </p>
+                 <div id='map3'></div>
+        <script>
+            /* Insert the JavaScript within the <script> tags, within the body */
+            // 2.1 Start with the Mapbox access token
+               mapboxgl.accessToken = 'pk.eyJ1Ijoic2hpeXUtemhhbmciLCJhIjoiY2x1bGtlOHh2MTJ1eTJrbzF0bjd0cndyZSJ9.tFLexsDGgB-w2HI9K9s2uw'; //  Put your access 
+
+            // 2.2 Then initialize the first map
+               var map = new mapboxgl.Map({
+                   container: 'map1', // id of a div on your page, where the map will be inserted
+                   style: 'mapbox://styles/mapbox/streets-v11', // the style URL 'mapbox://styles/mapbox/streets-v11' 
+                   center: [-77.0369, 38.9072], // starting position [lng, lat] eg. [-122.6788, 45.5212]
+                   zoom: 11 // starting zoom 
+               });
+
+            // 2.3 Add any other variables (such as popups and markers) to the first map
+            var popup = new mapboxgl.Popup({ offset: 25 })
+               .setText('Washington DC Cherry Blossoms: Cherry blossoms frame the iconic memorials along the Tidal Basin in pink and white.The best time of the year to visit is March.');
+
+               var marker = new mapboxgl.Marker({color:'red'})
+                 .setLngLat([-77.0369, 38.9072]) // starting position [lng, lat]
+                 .setPopup(popup) //add the popup named "popup" to this marker 
+                 .addTo(map); // add it to the map with the ID "map"
+
+            // 2.4 Add arguments to disable the map interactivity here
+            // Disable drag and zoom handlers.
+               map.dragPan.disable();
+               map.scrollZoom.disable();
+               map.boxZoom.disable();
+               map.dragRotate.disable();
+               map.keyboard.disable();
+               map.doubleClickZoom.disable();
+               map.touchZoomRotate.disable();
+               map.touchZoomRotate.disableRotation();
+
+            
+            // 2.5.3 Then initialize the 2nd map
+            // Then initialize the 2nd map
+             var map2 = new mapboxgl.Map({
+             container: 'map2', // id of a div on your page, where the map will be inserted
+             style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
+             center: [114.2986, 30.5844], // starting position [lng, lat] eg. [-122.6788, 45.5212]
+             zoom: 11 // starting zoom 
+             });
+            
+            // 2.5.4 Add any other variables (such as markers) to the second map
+             //var popup2 = new mapboxgl.Popup()
+                 //.setText('This is my second point: Wuhan');
+             var popup2 = new mapboxgl.Popup({ closeOnClick: true })
+                    .setHTML('<h3>East Lake Cherry Blossoms</h3><p>East Lake\'s cherry trees blossom into a sea of pink, attracting visitors to the serene lakeside paths. Walk along the lakeside, the breeze blows. Many young people come here to take artistic photos.</p>');
+
+             var marker2 = new mapboxgl.Marker({color:'blue'})
+               .setLngLat([114.2986, 30.5844]) // starting position [lng, lat] 
+               .setPopup(popup2) //add the popup to the marker 
+               .addTo(map2); // id it to the map with the ID *map2*
+
+            // 2.5.5 Add arguments to disable the second map's interactivity here
+            // Disable drag and zoom handlers. 
+             map2.dragPan.disable();
+             map2.scrollZoom.disable();
+             map2.boxZoom.disable();
+             map2.dragRotate.disable();
+             map2.keyboard.disable();
+             map2.doubleClickZoom.disable();
+             map2.touchZoomRotate.disable();
+             map2.touchZoomRotate.disableRotation();
+            // 2.6 Change the map pointers
+            // Change the map pointers
+                map.getCanvas().style.cursor = 'auto';
+                map2.getCanvas().style.cursor = 'auto';
+            
+ 
+            
+            
+            // Initialize the Tokyo map
+            var map3 = new mapboxgl.Map({
+                container: 'map3', // id of a div on your page, where the map will be inserted
+                style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
+                center: [139.6917, 35.6895], // starting position [lng, lat] for Tokyo
+                zoom: 11 // starting zoom
+            });
+
+            // Add any other variables such as markers here (part III)
+            var popup_layer_tokyo = new mapboxgl.Popup({
+                closeOnClick: false,
+                anchor: 'top-left'
+            })
+            .setLngLat([139.6917, 35.6895]) // These are the approximate coordinates for Ueno Park, Tokyo
+            .setHTML('<h3>Tokyo Cherry Blossoms</h3><p>Experience the cherry blossom festival at <a href="https://www.gotokyo.org/en/spot/26/index.html" target="_blank">Ueno Park</a>.</p>')
+            .addTo(map3);
+
+            var uenoParkMarker = new mapboxgl.Marker({
+                color: 'pink'
+            })
+            .setLngLat([139.6917, 35.6895]) // Coordinates for Ueno Park, Tokyo
+            .setPopup(popup_layer_tokyo)
+            .addTo(map3);
+
+            // Disable map interactions
+            map3.dragPan.disable();
+            map3.scrollZoom.disable();
+            map3.boxZoom.disable();
+            map3.dragRotate.disable();
+            map3.keyboard.disable();
+            map3.doubleClickZoom.disable();
+            map3.touchZoomRotate.disable();
+            map3.touchZoomRotate.disableRotation();
+            map3.getCanvas().style.cursor = 'auto';
+
+            
+        </script>
+  </body>
+</html>
