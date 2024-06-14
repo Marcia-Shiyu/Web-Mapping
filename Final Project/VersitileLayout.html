@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Map of Trees in Washington DC</title>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/js/foundation.js"></script>
+
+    <!-- CSS Links -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/css/foundation.min.css" rel="stylesheet" />
+    <link href="VersitileLayout.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Arial', sans-serif; /* Default font for the body */
+        }
+        .site-title {
+            font-family: 'Georgia', serif; /* Font for the title */
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 0;
+        }
+        .author-name {
+            font-family: 'Courier New', monospace; /* Font for the author name */
+            font-size: 18px; /* Adjusted size to be smaller than the title */
+            color: #34495e;
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+        .menu-title {
+            font-family: 'Verdana', sans-serif; /* Font for the Menu title */
+            font-size: 18px; /* Adjust size to be between h3 and h4 */
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .sidebar h3,
+        .content h3,
+        .content h5 {
+            font-family: 'Verdana', sans-serif; /* Font for headings in the sidebar and content */
+            font-weight: bold;
+        }
+        .content p,
+        .sidebar ul,
+        .legend li {
+            font-family: 'Tahoma', sans-serif; /* Font for paragraph and list text */
+        }
+        .floating-zoom-instruction {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #ffffff;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 1000;
+            max-width: 250px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+            transition: max-height 0.3s ease;
+            overflow: hidden;
+        }
+        .floating-zoom-instruction .arrow {
+            text-align: center;
+            cursor: pointer;
+        }
+        .floating-zoom-instruction .arrow::before {
+            content: "▼";
+            display: block;
+            font-size: 18px;
+            margin-top: -5px;
+        }
+        .floating-zoom-instruction.collapsed {
+            max-height: 25px;
+            padding-bottom: 20px;
+        }
+        .floating-zoom-instruction.collapsed .arrow::before {
+            content: "▲";
+        }
+        .legend {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .legend li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        .legend span {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+        .legend-details {
+            display: none;
+            padding-left: 25px;
+        }
+        .legend-header {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+            color: #007BFF;
+        }
+        .legend-header .toggle-icon {
+            margin-right: 5px;
+            font-size: 18px;
+        }
+        .content {
+            display: none; /* Initially hide all content panels */
+        }
+        .content h3 {
+            margin-top: 0;
+        }
+        .content-close-button {
+            display: none; /* Hide close button initially */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="site-header">
+        <strong class="site-title">Map of Trees in Washington DC</strong>
+    </div>
+
+    <div class="site-main grid-x">
+        <div class="search-container cell medium-3 large-2">
+            <strong class="author-name"> Author: Shiyu Zhang</strong>
+        </div>
+        
+        <div class="map-container cell medium-auto large-order-2" style="position: relative;">
+            <!--  ADD iframe here, inside the versatile layout's map container   -->
+            <iframe src="base map.html" title="Map" style="width: 100%; height: 100%; border: none;"></iframe>
+            <div class="floating-zoom-instruction" id="zoom-instruction">
+                <div class="arrow" id="toggle-zoom-instruction"></div>
+                <p>Zoom in to see the tree dots up close under the Choropleth Map!</p>
+            </div>
+        </div>
+
+        <!-- Sidebar panel -->
+        <div class="sidebar cell medium-3 large-2 large-order-1 show-for-medium">
+            <h4 class="menu-title">Menu</h4>
+            <ul>
+                <li><a class="content-link" href="#">Open Content: Map Introduction</a></li>
+                <li><a class="content-link-steps" href="#">Open Content: Steps to See the Map</a></li>
+                <li><a class="content-link-filter" href="#">Open Content: Steps to Use the Filter</a></li>
+            </ul>
+            <hr />
+        </div>
+
+        <div class="content-close-button-container">
+            <a href="#" class="content-close-button">×</a>
+        </div>
+        
+        <!-- Content panel for Map Introduction -->
+        <div class="content cell large-5 large-order-3" id="map-intro-content">
+            <h3>Map Introduction</h3>
+            <p>This interactive map shows various trees in Washington, D.C. Follow the sidebar prompts to interact with the map.</p>
+            <p>The map consists of two main layers:</p>
+            <ul>
+                <li><strong>Choropleth Map:</strong> This layer represents different regions in Washington, D.C. The regions are census tracts, and the color intensity indicates the density of trees in each tract. The numbers in the text represent the count of trees in the respective regions.</li>
+                <li><strong>Tree Points Map:</strong> This layer shows individual trees, each represented by a circle. The size of the circle varies based on the diameter at breast height (DBH) of the tree:
+                    <ul>
+                        <li>15.24 to 30.48 cm: 6 px</li>
+                        <li>30.48 to 45.72 cm: 7 px</li>
+                        <li>45.72 to 60.96 cm: 8 px</li>
+                        <li>60.96 to 76.2 cm: 9 px</li>
+                        <li>More than 76.2 cm: 10 px</li>
+                    </ul>
+                    The color of the circle represents the fall color of the tree, and the opacity represents the condition of the tree:
+                    <ul>
+                        <li>Excellent: 0.95</li>
+                        <li>Good: 0.8</li>
+                        <li>Fair: 0.6</li>
+                        <li>Poor: 0.4</li>
+                        <li>Dead: 0.2</li>
+                    </ul>
+                </li>
+            </ul>
+            <h5 class="legend-header"><span class="toggle-icon">+</span>Legend of fall colors for trees(Click + to see all)</h5>
+            <ul class="legend" style="display: none;">
+                <!-- Example legend items, add or modify as needed -->
+                <li><span style="background-color:#FF4500"></span>Quercus</li>
+                <li><span style="background-color:#FFA500"></span>Pyrus</li>
+                <li><span style="background-color:#FFD700"></span>Ulmus</li>
+                <li><span style="background-color:#FFFF00"></span>Tilia</li>
+                <li><span style="background-color:#A52A2A"></span>Platanus</li>
+                <li><span style="background-color:#FF0000"></span>Acer</li>
+                <li><span style="background-color:#FFA07A"></span>Zelkova</li>
+                <li><span style="background-color:#DAA520"></span>Gymnocladus</li>
+                <li><span style="background-color:#A9A9A9"></span>Unknown</li>
+                <li><span style="background-color:#8B0000"></span>Liquidambar</li>
+                <li><span style="background-color:#FFD700"></span>Ginkgo</li>
+                <li><span style="background-color:#FFFF99"></span>Cercis</li>
+                <li><span style="background-color:#FF6347"></span>Lagerstroemia</li>
+                <li><span style="background-color:#FFA500"></span>Cercidiphyllum</li>
+                <li><span style="background-color:#FFD700"></span>Carpinus</li>
+                <li><span style="background-color:#DC143C"></span>Pistacia</li>
+                <li><span style="background-color:#FFFF00"></span>Gleditsia</li>
+                <li><span style="background-color:#FF6347"></span>Malus</li>
+                <li><span style="background-color:#FFA500"></span>Prunus</li>
+                <li><span style="background-color:#B22222"></span>Nyssa</li>
+                <li><span style="background-color:#DEB887"></span>Magnolia</li>
+                <li><span style="background-color:#FFD700"></span>Robinia</li>
+                <li><span style="background-color:#FFD700"></span>Betula</li>
+                <li><span style="background-color:#FFD700"></span>Ostrya</li>
+                <li><span style="background-color:#FFFF99"></span>Cladrastis</li>
+                <li><span style="background-color:#800080"></span>Syringa</li>
+                <li><span style="background-color:#CD853F"></span>Fagus</li>
+                <li><span style="background-color:#FF4500"></span>Amelanchier</li>
+                <li><span style="background-color:#FFD700"></span>Liriodendron</li>
+                <li><span style="background-color:#FFFF99"></span>Morus</li>
+                <li><span style="background-color:#D2691E"></span>Taxodium</li>
+                <li><span style="background-color:#FFFF66"></span>Koelreuteria</li>
+                <li><span style="background-color:#D2691E"></span>Metasequoia</li>
+                <li><span style="background-color:#800080"></span>Fraxinus</li>
+                <li><span style="background-color:#228B22"></span>Pinus</li>
+                <li><span style="background-color:#B22222"></span>Ilex</li>
+                <li><span style="background-color:#FF4500"></span>Parrotia</li>
+                <li><span style="background-color:#FFFF66"></span>Styphnolobium</li>
+                <li><span style="background-color:#FFD700"></span>Halesia</li>
+                <li><span style="background-color:#FF4500"></span>Oxydendrum</li>
+                <li><span style="background-color:#B22222"></span>Stewartia</li>
+                <li><span style="background-color:#FF4500"></span>Cornus</li>
+                <li><span style="background-color:#FFFF66"></span>Eucommia</li>
+                <li><span style="background-color:#FFFF99"></span>Chionanthus</li>
+                <li><span style="background-color:#A52A2A"></span>Aesculus</li>
+                <li><span style="background-color:#228B22"></span>Juniperus</li>
+                <li><span style="background-color:#FFD700"></span>Juglans</li>
+                <li><span style="background-color:#FFFF99"></span>Ailanthus</li>
+                <li><span style="background-color:#FFFF00"></span>Salix</li>
+                <li><span style="background-color:#FFFF66"></span>Catalpa</li>
+                <li><span style="background-color:#FF4500"></span>Sassafras</li>
+                <li><span style="background-color:#FF6347"></span>Crataegus</li>
+                <li><span style="background-color:#FFD700"></span>Carya</li>
+                <li><span style="background-color:#B22222"></span>Rhus</li>
+                <li><span style="background-color:#FFD700"></span>Populus</li>
+                <li><span style="background-color:#FFFF66"></span>Diospyros</li>
+                <li><span style="background-color:#228B22"></span>Picea</li>
+                <li><span style="background-color:#800080"></span>Cotinus</li>
+                <li><span style="background-color:#FFFF66"></span>Laburnum</li>
+                <li><span style="background-color:#FFFF99"></span>Maackia</li>
+                <li><span style="background-color:#FFFF66"></span>Phellodendron</li>
+                <li><span style="background-color:#D2691E"></span>Cryptomeria</li>
+                <li><span style="background-color:#228B22"></span>Thuja</li>
+                <li><span style="background-color:#FFFF99"></span>Paulownia</li>
+                <li><span style="background-color:#FFFF66"></span>Maclura</li>
+                <li><span style="background-color:#228B22"></span>Tsuga</li>
+                <li><span style="background-color:#228B22"></span>Cedrus</li>
+                <li><span style="background-color:#FFFF66"></span>Alnus</li>
+                <li><span style="background-color:#FF4500"></span>Sorbus</li>
+                <li><span style="background-color:#FFFF66"></span>Albizia</li>
+            </ul>
+        </div>
+
+        <!-- Steps to see the map content panel -->
+        <div class="content cell large-5 large-order-3" id="steps-content">
+            <h3>Steps to See the Map</h3>
+            <ul>
+                <li>Zoom in and out to explore different areas of the map.
+                    <ul>
+                        <li>At zoom levels below 14, you will see the Choropleth Map showing the density of trees by census tract.</li>
+                        <li>At zoom levels 14 and above, you will see the Tree Points Map showing individual tree points represented by circles.</li>
+                    </ul>
+                </li>
+                <li>When the Choropleth Map is visible: Hover over or click on a region to see a popup with the census tract id and tree count.</li>
+                <li>When the Tree Points Map is visible: Click on a tree point to see detailed information about the tree. </li>
+            </ul>
+        </div>
+
+        <!-- Steps to use the map content panel -->
+        <div class="content cell large-5 large-order-3" id="filter-content">
+            <h3>Steps to Use the Filter</h3>
+            <ul>
+                <li>Use the filter option on the top-right of the map to select or deselect different types of trees based on genus, native status, overhead utility, diameter, and condition.</li>
+                <li>After setting the filters, click "Apply Filters" to update the map.</li>
+                <li>Click "Clear Filters" to reset all filters to their default values.</li>
+            </ul>
+        </div>
+         
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Show the floating zoom instruction initially
+            $('#zoom-instruction').show();
+
+            // Toggle the floating zoom instruction on arrow click
+            $('#toggle-zoom-instruction').click(function() {
+                $('#zoom-instruction').toggleClass('collapsed');
+            });
+
+            // Hide all content panels initially
+            $('.content').hide();
+
+            // Show the "Map Introduction" content
+            $('.content-link').click(function() {
+                $('.content').hide();
+                $('#map-intro-content').show();
+                $('.content-close-button').show(); // Show the close button when content is open
+                $('.site-main').addClass('has-content-open');
+                window.dispatchEvent(new Event('resize'));
+            });
+
+            // Show the "Steps to use the map" content
+            $('.content-link-steps').click(function() {
+                $('.content').hide();
+                $('#steps-content').show();
+                $('.content-close-button').show(); // Show the close button when content is open
+                $('.site-main').addClass('has-content-open');
+                window.dispatchEvent(new Event('resize'));
+            });
+
+            // Show the "Steps to use the filter" content
+            $('.content-link-filter').click(function() {
+                $('.content').hide();
+                $('#filter-content').show();
+                $('.content-close-button').show(); // Show the close button when content is open
+                $('.site-main').addClass('has-content-open');
+                window.dispatchEvent(new Event('resize'));
+            });
+            
+            // Hide content and close button when close button is clicked
+            $('.content-close-button-container').click(function() {
+                $('.content').hide();
+                $('.content-close-button').hide(); // Hide the close button when content is closed
+                $('.site-main').removeClass('has-content-open');
+                window.dispatchEvent(new Event('resize'));
+            });
+
+            // Toggle the legend visibility
+            $('.legend-header').click(function() {
+                if ($(this).find('.toggle-icon').text() === '+') {
+                    $(this).find('.toggle-icon').text('−');
+                    $('.legend').slideDown();
+                } else {
+                    $(this).find('.toggle-icon').text('+');
+                    $('.legend').slideUp();
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
