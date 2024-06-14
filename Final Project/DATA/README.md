@@ -1,4 +1,4 @@
-The following links are the data after preprocessing:
+The following links are the data after preprocessed:
 
 https://drive.google.com/file/d/1-hzRS1-UkmVc56mvebfBOag5iZNk18DF/view?usp=drive_link
 
