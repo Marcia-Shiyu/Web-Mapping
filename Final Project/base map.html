@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Washington DC Trees Map</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <!-- Link to Mapbox GL JS CSS -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
+    <!-- Link to Mapbox GL JS JavaScript library -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        /* Styling for the map container to fill the entire viewport */
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        /* Styling for the popup content */
+        .mapboxgl-popup-content {
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 14px;
+            font-family: 'Arial', sans-serif;
+        }
+        .mapboxgl-popup-content strong {
+            font-size: 12px;
+            font-family: 'Arial Black', sans-serif;
+        }
+        /* Styling for the filters container */
+        #filters {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            z-index: 1;
+            border-radius: 3px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            font-family: 'Arial', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Filters section for user to select tree attributes -->
+    <div id="filters">
+        <h3>Filters: Select Your Trees!</h3>
+        <label for="genus">Genus:</label>
+        <select id="genus">
+            <!-- Dropdown options for tree genus -->
+            <option value="">All</option>
+            <option value="Acer">Acer</option>
+            <option value="Aesculus">Aesculus</option>
+            <option value="Ailanthus">Ailanthus</option>
+            <!-- More options omitted for brevity -->
+        </select>
+        <br>
+        <label for="native">Native:</label>
+        <select id="native">
+            <!-- Dropdown options for native status -->
+            <option value="">All</option>
+            <option value="introduced">introduced</option>
+            <option value="naturally_occurring">naturally_occurring</option>
+            <option value="no_info">no_info</option>
+        </select>
+        <br>
+        <label for="overhead_utility">Overhead Utility:</label>
+        <select id="overhead_utility">
+            <!-- Dropdown options for overhead utility presence -->
+            <option value="">All</option>
+            <option value="No">No</option>
+            <option value="Yes">Yes</option>
+        </select>
+        <br>
+        <label for="diameter_breast_height_binned_CM">Diameter (binned):</label>
+        <select id="diameter_breast_height_binned_CM">
+            <!-- Dropdown options for diameter at breast height -->
+            <option value="">All</option>
+            <option value="0 to 15.24 cm">0 to 15.24 cm</option>
+            <option value="15.24 to 30.48 cm">15.24 to 30.48 cm</option>
+            <option value="30.48 to 45.72 cm">30.48 to 45.72 cm</option>
+            <!-- More options omitted for brevity -->
+        </select>
+        <br>
+        <label for="condition">Condition:</label>
+        <select id="condition">
+            <!-- Dropdown options for tree condition -->
+            <option value="">All</option>
+            <option value="dead">dead</option>
+            <option value="excellent">excellent</option>
+            <option value="fair">fair</option>
+            <option value="good">good</option>
+            <option value="poor">poor</option>
+        </select>
+        <br>
+        <!-- Buttons to apply and clear filters -->
+        <button id="apply-filters-button" onclick="applyFilters()">Apply Filters</button>
+        <button id="clear-filters-button" onclick="clearFilters()">Clear Filters</button>
+    </div>
+
+    <!-- Container for the map -->
+    <div id="map"></div>
+    
+    <script>
+        // Set the access token for Mapbox API
+        mapboxgl.accessToken = 'pk.eyJ1Ijoic2hpeXUtemhhbmciLCJhIjoiY2x1bGhqd2NxMTE3bDJxcDU2dHRlbzNwOCJ9.d8udiK4bPXGEaGDJQ5Aj-w';
+
+        // Define the bounds for the map (covering Washington DC area)
+        var bounds = [
+            [-77.26383, 38.73854], // Southwest coordinates
+            [-76.83569, 39.00114]  // Northeast coordinates
+        ];
+
+        // Initialize the Mapbox GL map
+        var map = new mapboxgl.Map({
+            container: 'map', // ID of the map container
+            style: 'mapbox://styles/shiyu-zhang/clw6nweb6002f01rd3yefexvj', // Custom style URL
+            center: [-77.04, 38.907], // Initial map center coordinates [longitude, latitude]
+            zoom: 10, // Initial zoom level
+            maxBounds: bounds // Constrain map to these bounds
+        });
+
+        // Function to apply the selected filters to the map
+        function applyFilters() {
+            var genus = document.getElementById('genus').value;
+            var native = document.getElementById('native').value;
+            var overhead_utility = document.getElementById('overhead_utility').value;
+            var diameter_breast_height_binned_CM = document.getElementById('diameter_breast_height_binned_CM').value;
+            var condition = document.getElementById('condition').value;
+
+            var filter = ['all']; // Initialize filter with 'all' to combine multiple conditions
+
+            // Add filter conditions based on user selections
+            if (genus) filter.push(['==', ['get', 'genus'], genus]);
+            if (native) filter.push(['==', ['get', 'native'], native]);
+            if (overhead_utility) filter.push(['==', ['get', 'overhead_utility'], overhead_utility]);
+            if (diameter_breast_height_binned_CM) filter.push(['==', ['get', 'diameter_breast_height_binned_CM'], diameter_breast_height_binned_CM]);
+            if (condition) filter.push(['==', ['get', 'condition'], condition]);
+
+            // Apply the combined filter to the map layer with tree points
+            map.setFilter('Tree Points Map', filter);
+        }
+
+        // Function to clear all the filters and reset to default
+        function clearFilters() {
+            // Reset all filter dropdowns to their default values
+            document.getElementById('genus').value = "";
+            document.getElementById('native').value = "";
+            document.getElementById('overhead_utility').value = "";
+            document.getElementById('diameter_breast_height_binned_CM').value = "";
+            document.getElementById('condition').value = "";
+            // Reapply filters to reflect the cleared state
+            applyFilters();
+        }
+
+        // Map load event handler
+        map.on('load', function () {
+            // Define layer IDs for map layers
+            const choroplethLayerId = 'Choropleth Map';
+            const treePointsLayerId = 'Tree Points Map';
+            const boundaryLayerId = 'Census Tract Boundaries';
+            // Initialize a popup for displaying information
+            let popup = new mapboxgl.Popup({
+                closeButton: false,
+                closeOnClick: false
+            });
+
+            // Add a layer for census tract boundaries with line style
+            map.addLayer({
+                id: boundaryLayerId,
+                type: 'line',
+                source: 'composite',
+                'source-layer': 'Aggregation_ACS_5-Year_Social-16qeis', // Source layer name
+                layout: {},
+                paint: {
+                    'line-color': '#2a3b2f',
+                    'line-width': 0.5
+                }
+            });
+
+            // Function to show popup with census tract information
+            const showPopup = (e) => {
+                const coordinates = e.lngLat; // Mouse click coordinates
+                const properties = e.features[0].properties; // Feature properties
+                const gisId = properties.GIS_ID.slice(26); // Extract GIS ID
+                const countObje = properties.COUNT_OBJE; // Tree count in the tract
+                const description = `<strong>DC_CensusTract_${gisId}</strong>: ${countObje} trees`; // Popup content
+
+                // Set and display the popup at the clicked location
+                popup.setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+            };
+
+            // Zoom event handler to toggle visibility of layers based on zoom level
+            map.on('zoom', function () {
+                if (map.getZoom() >= 14) { // High zoom level
+                    map.setLayoutProperty(choroplethLayerId, 'visibility', 'none'); // Hide choropleth layer
+                    map.setLayoutProperty(treePointsLayerId, 'visibility', 'visible'); // Show tree points layer
+                    map.setLayoutProperty(boundaryLayerId, 'visibility', 'none'); // Hide boundaries layer
+                    // Remove event listeners for choropleth layer
+                    map.off('mouseenter', choroplethLayerId, showPopup);
+                    map.off('mouseleave', choroplethLayerId, () => popup.remove());
+                    map.off('click', choroplethLayerId, showPopup);
+                } else { // Low zoom level
+                    map.setLayoutProperty(choroplethLayerId, 'visibility', 'visible'); // Show choropleth layer
+                    map.setLayoutProperty(treePointsLayerId, 'visibility', 'none'); // Hide tree points layer
+                    map.setLayoutProperty(boundaryLayerId, 'visibility', 'visible'); // Show boundaries layer
+                    // Add event listeners for choropleth layer
+                    map.on('mouseenter', choroplethLayerId, showPopup);
+                    map.on('mouseleave', choroplethLayerId, () => popup.remove());
+                    map.on('click', choroplethLayerId, showPopup);
+                }
+            });
+
+            // Add event listeners for mouse interactions on choropleth layer
+            map.on('mouseenter', choroplethLayerId, showPopup);
+            map.on('mouseleave', choroplethLayerId, () => popup.remove());
+            map.on('click', choroplethLayerId, showPopup);
+
+            // Click event handler for tree points layer
+            map.on('click', treePointsLayerId, function (e) {
+                var coordinates = e.features[0].geometry.coordinates.slice(); // Get clicked feature coordinates
+                var description = '<strong>Tree Information:</strong><ul>';
+                
+                // Build popup content with all properties of the clicked tree
+                for (var key in e.features[0].properties) {
+                    description += '<li><strong>' + key + ':</strong> ' + e.features[0].properties[key] + '</li>';
+                }
+                description += '</ul>';
+
+                // Adjust coordinates to handle longitude wrapping
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+
+                // Display the popup with the tree information
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+            });
+
+            // Change cursor style to pointer when hovering over tree points
+            map.on('mouseenter', treePointsLayerId, function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            // Revert cursor style when not hovering over tree points
+            map.on('mouseleave', treePointsLayerId, function () {
+                map.getCanvas().style.cursor = '';
+            });
+
+        });
+    </script>
+
+</body>
+</html>
